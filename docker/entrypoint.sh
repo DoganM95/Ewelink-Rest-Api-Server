@@ -7,9 +7,9 @@ elif [ -z ${EWELINK_REGION} ]; then
     echo "Please define a region using docker run -e var=<your_ewelink_region> ..."
 else
     cd /usr/src/app
-    sed -i "s/<your_ewelink_email>/$EWELINK_USERNAME/g" ./config/credentials.js
-    sed -i "s/<your_ewelink_password>/$EWELINK_PASSWORD/g" ./config/credentials.js
-    sed -i "s/<your_ewelink_region>/$EWELINK_REGION/g" ./config/credentials.js
+    sed -i "s/ewelink_email: '.*'/ewelink_email: '$EWELINK_USERNAME'/g" ./config/credentials.js
+    sed -i "s/ewelink_password: '.*'/ewelink_password: '$EWELINK_PASSWORD'/g" ./config/credentials.js
+    sed -i "s/ewelink_region: '.*'/ewelink_region: '$EWELINK_REGION'/g" ./config/credentials.js
 fi
 
 # Run Node js server code

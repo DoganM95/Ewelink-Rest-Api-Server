@@ -2,7 +2,7 @@
 // ignore this message, if you are inside a docker container
 
 module.exports = {
-    email: '<your_ewelink_email>',
-    password: '<your_ewelink_password>',
-    region: '<your_ewelink_region>',
+    ewelink_email: '<your_ewelink_email>',
+    ewelink_password: '<your_ewelink_password>',
+    ewelink_region: '<your_ewelink_region>',
 }

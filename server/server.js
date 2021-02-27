@@ -17,9 +17,9 @@ console.log(settings);
 
 /* instantiate class */
 const connection = new ewelink({
-    email: credentials.email,
-    password: credentials.password,
-    region: credentials.region,
+    email: credentials.ewelink_email,
+    password: credentials.ewelink_password,
+    region: credentials.ewelink_region,
 });
 
 (async function testCredentials() {
