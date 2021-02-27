@@ -1,0 +1,1 @@
+Get-ChildItem ../config/*_template.js | Rename-Item -NewName { $_.Name -replace '_template', '' }
