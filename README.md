@@ -3,7 +3,7 @@
 ## Setup
 - ### On a windows machine:
 1. start a terminal session and cd into `/server` 
-2. `npm run setupw` renames _template files in config and runs npm install
+2. `npm run setupw` renames "..._template.js" files in config folder and installs necessary npm packages
 3. edit config/credentials.js (and config/settings.js if needed)  
 4. `npm run serve` starts the server (`localhost:3000` if not configured)
 5. `npm run killw` kills any running node apps (in case of startup errors) 
