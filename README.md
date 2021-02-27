@@ -34,7 +34,6 @@
 
   `GET`-request with any/no body to the server.
 
-## Docker
+## Docker image:
 
-### Using Docker Hub
-
+https://hub.docker.com/repository/docker/doganm95/ewelink-rest-api-server
