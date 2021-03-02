@@ -24,7 +24,7 @@
 }
 ```
 
-- `devicenameincludes` is an array containing keywords which the device to control can contain. The device which has the highest match to the given keywords will be controlled.  
+- `devicenameincludes` is an array of keywords which the name of the device to be controlled can contain. The device which has the highest match to the given keywords will be controlled. If 2 devices have the same match-score, the last device (of devices object, see GET-Request) is controlled. 
 
 - `deviceid` is the device's id itself, can be looked up e.g. in the eWelink Smartphone app or using a get request to this server.  Deviceid will always be prioritized over devicenameincludes.
 
