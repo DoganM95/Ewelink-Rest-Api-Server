@@ -1,4 +1,4 @@
-### Runs a node.js server which accepts http requests and sends corresponding commands to ewelink servers to turn on/off or toggle devices using the [this eWelink API](https://ewelink-api.now.sh/docs/quickstart).
+### Runs a node.js server which accepts http requests and sends corresponding commands to ewelink servers to turn on/off or toggle devices using [this eWelink API](https://ewelink-api.now.sh/docs/quickstart).
 
 ## Setup
 - ### On a windows machine:
