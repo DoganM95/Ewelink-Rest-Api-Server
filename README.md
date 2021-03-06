@@ -34,6 +34,17 @@
 
   `GET`-request with any/no body to the server.
 
-## Docker image:
+## Docker:
 
+### Image on Docker Hub:
 https://hub.docker.com/repository/docker/doganm95/ewelink-rest-api-server
+
+
+### Local build:
+
+`docker build -t doganm95/ewelink-rest-api-server -f ./docker/Dockerfile .`
+
+### Run the image: 
+`docker run -p <port>:5000 -e "EWELINK_USERNAME=<your_username>" -e "EWELINK_PASSWORD=<your_password>" -e "EWELINK_REGION=<your_region>" doganm95/ewelink-rest-api-server`  
+
+Note: replace `<your_username>` and `<your_password>` with your credentials and `<port>` with your desired port
