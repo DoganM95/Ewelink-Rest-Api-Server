@@ -24,7 +24,7 @@
    `docker build -t doganm95/ewelink-rest-api-server -f ./docker/Dockerfile .`  
   4. Run the image as a container:  
    `docker run -p <port>:5000 -e "EWELINK_USERNAME=<your_username>" -e "EWELINK_PASSWORD=<your_password>" -e "EWELINK_REGION=<your_region>" doganm95/ewelink-rest-api-server` 
-       >Replace `<your_username>` and `<your_password>` with your credentials and `<port>` with your desired port  
+       >Replace `<your_username>`, `<your_password>` and `<your_region>` with your credentials and `<port>` with your desired port  
 
 ## Requests
 
