@@ -30,7 +30,7 @@
 
 ### Control a device using keywords or its ID:
 
-`POST`-request to the server with the following body for example:
+`POST`-request to the server with the following body for example:  
 
 ```json
 {  
