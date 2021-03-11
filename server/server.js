@@ -6,6 +6,7 @@ const require = createRequire(
 const ewelink = require("ewelink-api");
 const express = require("express");
 const app = express();
+const escape = require('escape-html');
 
 const port = 3000;
 
@@ -70,11 +71,11 @@ app.post("/", async (req, res) => {
                 res.status(actionResponse.status == "ok" ? 200 : 404).send(`Device ''${selectedDevice.deviceid}'' named ''${selectedDevice.name}'' ${actionResponse.status == "ok" ? 'successfully toggled ' + (deviceStateAfterAction.state) : 'failed to toggle ' + (deviceStateAfterAction.state == "on" ? "off" : "on")}`);
                 break;
             default:
-                res.status(400).send(`Invalid action ${requestedActionOnDevice}, valid choices are [on, off, toggle]`, );
+                res.status(400).send(`Invalid action ${escape(requestedActionOnDevice)}, valid choices are [on, off, toggle]`, );
                 break;
         }
     } else
-        res.status(404).send(`No device found matching id: "${requestedDeviceId}" or name-keys: "${requestedDeviceNameKeys}"`);
+        res.status(404).send(`No device found matching id: "${escape(requestedDeviceId)}" or name-keys: "${escape(requestedDeviceNameKeys)}"`);
 });
 
 app.get("/", async (req, res) => {
