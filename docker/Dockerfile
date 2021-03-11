@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 
 # Copy package*.json 
 RUN mkdir ./server
-COPY ./server/package*.json ./server
+COPY ./server/package*.json ./server/
 
 # Install app dependencies
 RUN npm install
@@ -14,7 +14,7 @@ RUN npm install
 RUN npm ci --only=production
 
 # Bundle app source
-COPY . .
+COPY . ./
 
 # rename credential file
 RUN mv ./config/credentials_template.js ./config/credentials.js
