@@ -8,14 +8,14 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
     
     - name: Checkout repo
       uses: actions/checkout@v2
       
     - name: List directory
-      run: dir
+      run: ls -la
       
     - name: Build the Docker image
       run: docker build -f ./docker/Dockerfile . -t doganm95/ewelink-rest-api-server 
