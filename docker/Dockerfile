@@ -7,6 +7,7 @@ WORKDIR /usr/src/app
 COPY . ./
 
 # Install app dependencies
+RUN npm install
 RUN cd ./server
 RUN npm install
 
