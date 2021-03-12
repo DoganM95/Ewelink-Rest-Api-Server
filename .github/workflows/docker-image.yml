@@ -21,7 +21,7 @@ jobs:
       run: docker build --file ./docker/Dockerfile . --tag doganm95/ewelink-rest-api-server
 
     - name: Run the container
-      run: docker run -p 5000:5000 -e "EWELINK_USERNAME=${{ secrets.EWELINK_USERNAME }}" -e "EWELINK_PASSWORD=${{ secrets.EWELINK_PASSWORD }}" -e "EWELINK_REGION=${{ EWELINK_REGION }}" doganm95/ewelink-rest-api-server
+      run: docker run -p 5000:5000 -e "EWELINK_USERNAME=${{ secrets.EWELINK_USERNAME }}" -e "EWELINK_PASSWORD=${{ secrets.EWELINK_PASSWORD }}" -e "EWELINK_REGION=${{ secrets.EWELINK_REGION }}" doganm95/ewelink-rest-api-server
 
 #     - name: Push to Docker Hub
 #       uses: docker/build-push-action@v1
