@@ -16,6 +16,9 @@ RUN npm ci --only=production
 # Bundle app source
 COPY . ./
 
+# Set permissions
+RUN chmod +rwx ./docker/entrypoint.sh
+
 # rename credential file
 RUN mv ./config/credentials_template.js ./config/credentials.js
 RUN mv ./config/settings_template.js ./config/settings.js
