@@ -14,14 +14,14 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v2
       
-    - name: List directory
+    - name: List repository files
       run: ls -la
       
     - name: Build the Docker image
-      run: docker build -f ./docker/Dockerfile . -t doganm95/ewelink-rest-api-server 
+      run: docker build --file ./docker/Dockerfile . --tag doganm95/ewelink-rest-api-server
 
-#     - name: Run Container
-#       run: docker run -p 5000:5000 -e "EWELINK_USERNAME=${{ secrets.EWELINK_USERNAME }}" -e "EWELINK_PASSWORD=" -e "EWELINK_REGION=<your_region>" doganm95/ewelink-rest-api-server
+    - name: Run the container
+      run: docker run -p 5000:5000 -e "EWELINK_USERNAME=${{ secrets.EWELINK_USERNAME }}" -e "EWELINK_PASSWORD=${{ secrets.EWELINK_PASSWORD }}" -e "EWELINK_REGION=${{ secrets.EWELINK_REGION }}" doganm95/ewelink-rest-api-server
 
 #     - name: Push to Docker Hub
 #       uses: docker/build-push-action@v1
