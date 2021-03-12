@@ -13,9 +13,6 @@ const port = 3000;
 import credentials from "../config/credentials.js";
 import settings from "../config/settings.js";
 
-console.log(credentials);
-console.log(settings);
-
 /* instantiate class */
 const connection = new ewelink({
     email: credentials.ewelink_email,
