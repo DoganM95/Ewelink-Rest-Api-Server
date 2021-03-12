@@ -3,18 +3,17 @@ FROM node:latest
 # Create app directory
 WORKDIR /usr/src/app
 
-# Copy package*.json 
-RUN mkdir ./server
-COPY ./server/package*.json ./server/
+# Bundle app source
+COPY . ./
 
 # Install app dependencies
+RUN cd ./server
 RUN npm install
 
 # Prepare for production use
 RUN npm ci --only=production
 
-# Bundle app source
-COPY . ./
+RUN cd ..
 
 # Set permissions
 RUN chmod +rwx ./docker/entrypoint.sh
