@@ -20,8 +20,17 @@ jobs:
     - name: Build the Docker image
       run: docker build --file ./docker/Dockerfile . --tag doganm95/ewelink-rest-api-server
 
-    - name: Run the container
-      run: docker run -p 3000:3000 -e "EWELINK_USERNAME=${{ secrets.EWELINK_USERNAME }}" -e "EWELINK_PASSWORD=${{ secrets.EWELINK_PASSWORD }}" -e "EWELINK_REGION=${{ secrets.EWELINK_REGION }}" doganm95/ewelink-rest-api-server
+    - uses: docker/build-push-action@v1
+      with:
+        repository: doganm95/ewelink-rest-api-server
+        push: false
+    - uses: addnab/docker-run-action@v2
+      with:
+        image: doganm95/ewelink-rest-api-server:latest
+        run: echo "hello world"
+
+#     - name: Run the container
+#       run: docker run -p 3000:3000 -e "EWELINK_USERNAME=${{ secrets.EWELINK_USERNAME }}" -e "EWELINK_PASSWORD=${{ secrets.EWELINK_PASSWORD }}" -e "EWELINK_REGION=${{ secrets.EWELINK_REGION }}" doganm95/ewelink-rest-api-server
 
 #     - name: Push to Docker Hub
 #       uses: docker/build-push-action@v1
