@@ -8,8 +8,6 @@ const express = require("express");
 const app = express();
 const escape = require('escape-html');
 
-const port = 3000;
-
 import credentials from "../config/credentials.js";
 import settings from "../config/settings.js";
 
@@ -86,7 +84,7 @@ app.get("/", async (req, res) => {
     res.status(200).json(devices);
 });
 
-app.listen(port, () => {
+app.listen(settings.port, () => {
     console.log(`Ewelink api server listening on http://localhost:${settings.port}`);
 });
 
