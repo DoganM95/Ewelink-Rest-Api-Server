@@ -6,7 +6,7 @@ const require = createRequire(
 const ewelink = require("ewelink-api");
 const express = require("express");
 const app = express();
-const escape = require('escape-html');
+const escape = require("escape-html");
 
 import credentials from "../config/credentials.js";
 import settings from "../config/settings.js";
@@ -20,7 +20,7 @@ const connection = new ewelink({
 
 (async function testCredentials() {
     const devices = await connection.getDevices();
-    if ('error' in devices)
+    if ("error" in devices)
         console.log(devices.msg + ". The application will continue and respond with the error message, to make sure you are informed.");
 })();
 
@@ -33,7 +33,7 @@ app.post("/", async (req, res) => {
 
     const devices = await connection.getDevices();
 
-    if ('error' in devices) {
+    if ("error" in devices) {
         res.status(devices.error).send(devices.msg);
         return;
     }
@@ -52,21 +52,34 @@ app.post("/", async (req, res) => {
     }
 
     if (selectedDevice != undefined) {
-        const actionResponse = requestedActionOnDevice == "toggle" ?
+        const actionResponse =
+            requestedActionOnDevice == "toggle" ?
             await connection.toggleDevice(selectedDevice.deviceid) :
             await connection.setDevicePowerState(selectedDevice.deviceid, requestedActionOnDevice);
-        const deviceStateAfterAction = await connection.getDevicePowerState(selectedDevice.deviceid)
+        const deviceStateAfterAction = await connection.getDevicePowerState(selectedDevice.deviceid);
 
         switch (requestedActionOnDevice) {
             case "on":
             case "off":
-                res.status(actionResponse.status == "ok" ? 200 : 404).send(`Device ''${selectedDevice.deviceid}'' named ''${selectedDevice.name}'' ${actionResponse.status == "ok" ? 'successfully switched ' + (deviceStateAfterAction.state) : 'failed to switch ' + (deviceStateAfterAction.state == "on" ? "off" : "on")}`);
+                res.status(actionResponse.status == "ok" ? 200 : 404).send(
+                    `Device ''${selectedDevice.deviceid}'' named ''${selectedDevice.name}'' ${
+                    actionResponse.status == "ok" ?
+                        "successfully switched " + deviceStateAfterAction.state :
+                        "failed to switch " + (deviceStateAfterAction.state == "on" ? "off" : "on")
+                    }`
+                );
                 break;
             case "toggle":
-                res.status(actionResponse.status == "ok" ? 200 : 404).send(`Device ''${selectedDevice.deviceid}'' named ''${selectedDevice.name}'' ${actionResponse.status == "ok" ? 'successfully toggled ' + (deviceStateAfterAction.state) : 'failed to toggle ' + (deviceStateAfterAction.state == "on" ? "off" : "on")}`);
+                res.status(actionResponse.status == "ok" ? 200 : 404).send(
+                    `Device ''${selectedDevice.deviceid}'' named ''${selectedDevice.name}'' ${
+                    actionResponse.status == "ok" ?
+                        "successfully toggled " + deviceStateAfterAction.state :
+                        "failed to toggle " + (deviceStateAfterAction.state == "on" ? "off" : "on")
+                    }`
+                );
                 break;
             default:
-                res.status(400).send(`Invalid action ${escape(requestedActionOnDevice)}, valid choices are [on, off, toggle]`, );
+                res.status(400).send(`Invalid action ${escape(requestedActionOnDevice)}, valid choices are [on, off, toggle]`);
                 break;
         }
     } else
@@ -76,7 +89,7 @@ app.post("/", async (req, res) => {
 app.get("/", async (req, res) => {
     const devices = await connection.getDevices();
 
-    if ('error' in devices) {
+    if ("error" in devices) {
         res.status(devices.error).send(devices.msg);
         return;
     }
@@ -88,8 +101,6 @@ app.listen(settings.port, () => {
     console.log(`Ewelink api server listening on http://localhost:${settings.port}`);
 });
 
-
-
 // Gets the device with highest count of matches of provided key-array.
 // If multiple devices have the same match-count, the last matched is returned.
 // This could be modified to return groups od devices if needed later on.
@@ -98,9 +109,8 @@ function getDeviceByName(devices, nameKeys) {
     let highestMatchingKeyCount = 0;
     for (let deviceIndex in devices) {
         let matchingKeyCount = 0;
-        for (let nameKeyIndex in nameKeys) {
+        for (let nameKeyIndex in nameKeys)
             matchingKeyCount += String(devices[deviceIndex].name).toLowerCase().includes(String(nameKeys[nameKeyIndex]).toLowerCase()) ? 1 : 0;
-        }
         if (matchingKeyCount > highestMatchingKeyCount) {
             highestMatchingKeyCount = matchingKeyCount;
             bestMatchingDevice = devices[deviceIndex];
@@ -109,13 +119,11 @@ function getDeviceByName(devices, nameKeys) {
     return bestMatchingDevice;
 }
 
-
 function getDeviceById(devices, id) {
     let deviceToReturn = undefined;
-    devices.forEach(device => {
-        if (String(device.deviceid) == id) {
+    devices.forEach((device) => {
+        if (String(device.deviceid) == id)
             deviceToReturn = device;
-        }
     });
     return deviceToReturn;
 }
