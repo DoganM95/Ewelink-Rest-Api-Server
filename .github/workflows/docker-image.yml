@@ -11,29 +11,26 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [14, 15.4]
+        node: [15.x]
         
     steps:
     
     - name: Checkout repo
       uses: actions/checkout@v2
       
-    - name: List repository files
-      run: ls -la
-      
       # Configures the node version used on GitHub-hosted runners
-    - uses: actions/setup-node@v1
+    - uses: actions/setup-node@main
       with:
         # The Node.js version to configure
-        node-version: ${{ matrix.node }}
+        node-version: ${{matrix.node}}
       
-    - name: Apt update
+    - name: Echo installed node and npm version
       run: |
         node -v
         npm --version
       
     - name: Build the Docker image
-      run: docker build --file ./docker/Dockerfile . --tag doganm95/ewelink-rest-api-server-test
+      run: docker build --file ./docker/Dockerfile . --tag doganm95/ewelink-rest-api-server
 
     - name: Run the container
       run: docker run -p 3000:3000 -e "EWELINK_USERNAME=${{secrets.EWELINK_USERNAME}}" -e "EWELINK_PASSWORD=${{secrets.EWELINK_PASSWORD}}" -e "EWELINK_REGION=${{secrets.EWELINK_REGION}}" doganm95/ewelink-rest-api-server
