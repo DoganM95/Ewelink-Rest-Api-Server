@@ -9,6 +9,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [14, 15.4]
+        
     steps:
     
     - name: Checkout repo
