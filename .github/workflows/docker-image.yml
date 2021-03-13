@@ -19,7 +19,7 @@ jobs:
       
     - name: Apt update
       run: |
-        node --version
+        node -v | echo
         npm --version
       
     - name: Build the Docker image
