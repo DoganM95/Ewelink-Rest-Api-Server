@@ -11,6 +11,7 @@
   "scripts": {
     "setupw": "powershell '../setup/windows.ps1' && npm install",
     "serve": "node ./server.js",
+    "kill": "sudo killall node",
     "killw": "taskkill /f /im node.exe"
   },
   "author": "DoganM95",
