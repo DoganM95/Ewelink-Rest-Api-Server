@@ -8,14 +8,13 @@ const express = require("express");
 const app = express();
 const escape = require("escape-html");
 
-import credentials from "../config/credentials.js";
-import settings from "../config/settings.js";
+const credentials = require("../config/credentials")
+const settings = require("../config/settings")
 
-/* instantiate class */
 const connection = new ewelink({
-    email: credentials.ewelink_email,
-    password: credentials.ewelink_password,
-    region: credentials.ewelink_region,
+    email: escape(credentials.ewelink_email),
+    password: escape(credentials.ewelink_password),
+    region: escape(credentials.ewelink_region)
 });
 
 (async function testCredentials() {
@@ -121,7 +120,7 @@ function getDeviceByName(devices, nameKeys) {
 
 function getDeviceById(devices, id) {
     let deviceToReturn = undefined;
-    devices.forEach((device) => {
+    devices.forEach(device => {
         if (String(device.deviceid) == id)
             deviceToReturn = device;
     });
