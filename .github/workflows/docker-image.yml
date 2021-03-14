@@ -33,16 +33,19 @@ jobs:
   
 #     - name: Run the container
 #       run: docker run -p 3000:3000 -e "EWELINK_USERNAME=${{secrets.EWELINK_USERNAME}}" -e "EWELINK_PASSWORD=${{secrets.EWELINK_PASSWORD}}" -e "EWELINK_REGION=${{secrets.EWELINK_REGION}}" doganm95/ewelink-rest-api-server
-        
-    - name: Push image to Docker Hub
-      uses: docker/build-push-action@v2
-      with:
+
+    - name: Login to DockerHub
+      with: 
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-        repository: doganm95/ewelink-rest-api-server
-        tag_with_ref: true
 
-
+    - name: Push image to Docker Hub
+      id: docker_build
+      uses: docker/build-push-action@v2
+      with:
+        push: true
+        tags: doganm95/ewelink-rest-api-server:latest
+      
 
 
 # jobs:
