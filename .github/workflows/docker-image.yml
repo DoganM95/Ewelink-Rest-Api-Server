@@ -7,61 +7,43 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  docker:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [15.x]
+        node: [14.x, 15.x]
         
     steps:
     
     - name: Checkout repo
       uses: actions/checkout@v2
       
-      # Configures the node version used on GitHub-hosted runners
-    - uses: actions/setup-node@main
+    - name: Setup specific node version
+      uses: actions/setup-node@main
       with:
-        # The Node.js version to configure
         node-version: ${{matrix.node}}
       
-    - name: Echo installed node and npm version
+    - name: Show installed node and npm version
       run: |
         node -v
         npm --version
       
     - name: Build the Docker image
-      run: sudo docker build --file ./docker/Dockerfile . --tag doganm95/ewelink-rest-api-server
+      run: docker build --file ./docker/Dockerfile . --tag doganm95/ewelink-rest-api-server
+  
+#     - name: Run the container
+#       run: docker run -p 3000:3000 -e "EWELINK_USERNAME=${{secrets.EWELINK_USERNAME}}" -e "EWELINK_PASSWORD=${{secrets.EWELINK_PASSWORD}}" -e "EWELINK_REGION=${{secrets.EWELINK_REGION}}" doganm95/ewelink-rest-api-server
+        
+    - name: Push image to Docker Hub
+      uses: docker/login-action@v1 
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        repository: doganm95/ewelink-rest-api-server
+        tag_with_ref: true
 
-    - name: Run the container
-      run: docker run -p 3000:3000 -e "EWELINK_USERNAME=${{secrets.EWELINK_USERNAME}}" -e "EWELINK_PASSWORD=${{secrets.EWELINK_PASSWORD}}" -e "EWELINK_REGION=${{secrets.EWELINK_REGION}}" doganm95/ewelink-rest-api-server
-
-#     - name: Push to Docker Hub
-#       uses: docker/build-push-action@v1
-#       with:
-#         username: ${{ secrets.DOCKER_USERNAME }}
-#         password: ${{ secrets.DOCKER_PASSWORD }}
-#         repository: my-docker-hub-namespace/my-docker-hub-repository
-#         tag_with_ref: true
 
 
-# name: Docker
-
-# on:
-#   push:
-#     # Publish `main` as Docker `latest` image.
-#     branches:
-#       - main
-
-#     # Publish `v1.2.3` tags as releases.
-#     tags:
-#       - latest
-
-#   # Run tests for any PRs.
-#   pull_request:
-
-# env:
-#   # TODO: Change variable to your image's name.
-#   IMAGE_NAME: doganm95/ewelink-rest-api-server
 
 # jobs:
 #   # Run tests.
