@@ -1,5 +1,5 @@
 # Node packages
-node_modules
+# node_modules
 
 # IDE settings
 .vscode/*
