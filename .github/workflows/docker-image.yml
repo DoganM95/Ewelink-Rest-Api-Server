@@ -9,24 +9,24 @@ on:
 jobs:
   docker:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: [14.x, 15.x]
+#     strategy:
+#       matrix:
+#         node: [14.x, 15.x]
         
     steps:
     
     - name: Checkout repo
       uses: actions/checkout@v2
       
-    - name: Setup specific node version
-      uses: actions/setup-node@main
-      with:
-        node-version: ${{matrix.node}}
+#     - name: Setup specific node version
+#       uses: actions/setup-node@main
+#       with:
+#         node-version: ${{matrix.node}}
       
-    - name: Show installed node and npm version
-      run: |
-        node -v
-        npm --version
+#     - name: Show installed node and npm version
+#       run: |
+#         node -v
+#         npm --version
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v1
