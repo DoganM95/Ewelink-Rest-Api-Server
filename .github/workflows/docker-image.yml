@@ -27,8 +27,6 @@ jobs:
       run: |
         node -v
         npm --version
-      
-      
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v1
@@ -51,30 +49,6 @@ jobs:
         tags: doganm95/ewelink-rest-api-server:latest
       
       
-      
-      
-      
-#     - name: Build the Docker image
-#       run: docker build --file ./docker/Dockerfile . --tag doganm95/ewelink-rest-api-server
-  
-# #     - name: Run the container
-# #       run: docker run -p 3000:3000 -e "EWELINK_USERNAME=${{secrets.EWELINK_USERNAME}}" -e "EWELINK_PASSWORD=${{secrets.EWELINK_PASSWORD}}" -e "EWELINK_REGION=${{secrets.EWELINK_REGION}}" doganm95/ewelink-rest-api-server
-
-#     - name: Login to DockerHub
-#       uses: docker/login-action@v1
-#       with: 
-#         username: ${{ secrets.DOCKERHUB_USERNAME }}
-#         password: ${{ secrets.DOCKERHUB_ACCESSTOKEN }}
-
-#     - name: Push image to Docker Hub
-#       id: docker_build
-#       uses: docker/build-push-action@v2
-#       with:
-#         push: true
-#         tags: doganm95/ewelink-rest-api-server:latest
-      
-
-
 # jobs:
 #   # Run tests.
 #   # See also https://docs.docker.com/docker-hub/builds/automated-testing/
