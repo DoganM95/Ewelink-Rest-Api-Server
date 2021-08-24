@@ -12,7 +12,7 @@
 
 - ### As a docker container  
 
-    #### Using pre-built image from docker hub
+  - #### Using pre-built image from docker hub (recommended)
 
     [See documentation on docker hub](https://hub.docker.com/repository/docker/doganm95/ewelink-rest-api-server)
 
