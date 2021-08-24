@@ -29,7 +29,10 @@ jobs:
 
       - name: Install necessary packages
         run: |
+          repo=$(pwd)
+          cd ./server
           npm install
+          cd $repo
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
