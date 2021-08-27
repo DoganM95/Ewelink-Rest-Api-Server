@@ -1,22 +1,12 @@
 ### Runs a node.js server which accepts http requests and sends corresponding commands to ewelink servers to turn on/off or toggle devices using [this eWelink API](https://ewelink-api.now.sh/docs/quickstart)
 
-## Setup
+## Setup (Docker Container)
 
-- ### On a windows machine
-
-1. start a terminal session and cd into `/server`  
-2. `npm run setupw` renames "..._template.js" files in config folder and installs necessary npm packages  
-3. edit **config/credentials.js** (and **config/settings.js** if needed)  
-4. `npm run serve` starts the server (`localhost:3000` if not configured)  
-5. `npm run killw` kills any running node apps (in case of startup errors)  
-
-- ### As a docker container  
-
-- #### Using pre-built image from docker hub (recommended)
+- ### Using pre-built image from docker hub (recommended)
 
     [See documentation on docker hub](https://hub.docker.com/repository/docker/doganm95/ewelink-rest-api-server)
 
-- #### Building it locally (clone repository first)
+- ### Building it locally (clone repository first)
 
   1. `git clone https://github.com/DoganM95/Ewelink-rest-api-server`  
   2. Open a terminal session in the cloned folder
