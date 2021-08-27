@@ -12,11 +12,11 @@
 
 - ### As a docker container  
 
-  - #### Using pre-built image from docker hub (recommended)
+- #### Using pre-built image from docker hub (recommended)
 
     [See documentation on docker hub](https://hub.docker.com/repository/docker/doganm95/ewelink-rest-api-server)
 
-  - #### Building it locally (clone repository first)
+- #### Building it locally (clone repository first)
 
   1. `git clone https://github.com/DoganM95/Ewelink-rest-api-server`  
   2. Open a terminal session in the cloned folder
@@ -24,7 +24,6 @@
    `docker build -t doganm95/ewelink-rest-api-server -f ./docker/Dockerfile .`  
   4. Run the image as a container:  
    `docker run -p <port>:3000 -e "EWELINK_USERNAME=<your_username>" -e "EWELINK_PASSWORD=<your_password>" -e "EWELINK_REGION=<your_region>" doganm95/ewelink-rest-api-server`  
-       >Replace `<your_username>`, `<your_password>` and `<your_region>` with your credentials and `<port>` with your desired port  
 
 ## Requests
 
