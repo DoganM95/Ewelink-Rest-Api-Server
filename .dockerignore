@@ -3,9 +3,9 @@
 .vscode
 LICENSE
 README.md
-node_modules
-npm-debug.log
+
+**/node_modules
+**/npm-debug.log
 
 # personal data
-credentials.js
-settings.js
+**/docker_reset.ps1
