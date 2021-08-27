@@ -8,14 +8,12 @@ const express = require("express");
 const app = express();
 const escape = require("escape-html");
 
-const credentials = require("../config/credentials")
-const settings = require("../config/settings")
-
 const connection = new ewelink({
-    email: escape(credentials.ewelink_email),
-    password: escape(credentials.ewelink_password),
-    region: escape(credentials.ewelink_region)
+    email: process.env.EWELINK_USERNAME,
+    password: process.env.EWELINK_PASSWORD,
+    region: process.env.EWELINK_REGION
 });
+const port = process.env.PORT;
 
 (async function testCredentials() {
     const devices = await connection.getDevices();
@@ -96,13 +94,15 @@ app.get("/", async (req, res) => {
     res.status(200).json(devices);
 });
 
-app.listen(settings.port, () => {
-    console.log(`Ewelink api server listening on http://localhost:${settings.port}`);
+app.listen(port, () => {
+    console.log(`Ewelink api server listening on http://localhost:${port}`);
 });
 
-// Gets the device with highest count of matches of provided key-array.
-// If multiple devices have the same match-count, the last matched is returned.
-// This could be modified to return groups od devices if needed later on.
+/** 
+ * @param {Object[]} devices Contains all known devices
+ * @param {String[]} nameKeys Contains keywords to match the name fully/partly
+ * @returns {Object} device, that matches the keyword sum best
+*/
 function getDeviceByName(devices, nameKeys) {
     let bestMatchingDevice = undefined;
     let highestMatchingKeyCount = 0;
@@ -118,6 +118,11 @@ function getDeviceByName(devices, nameKeys) {
     return bestMatchingDevice;
 }
 
+/** 
+ * @param {Object[]} devices Contains all known devices
+ * @param {String[]} id ID of device to control, look up in ewelink app
+ * @returns {Object} device, matching the given id
+*/
 function getDeviceById(devices, id) {
     let deviceToReturn = undefined;
     devices.forEach(device => {
