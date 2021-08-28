@@ -13,9 +13,24 @@
   3. Build the docker image using the cloned files:  
    `docker build -t doganm95/ewelink-rest-api-server -f ./docker/Dockerfile .`  
   4. Run the image as a container:  
-   `docker run -p <port>:3000 -e "EWELINK_USERNAME=<your_username>" -e "EWELINK_PASSWORD=<your_password>" -e "EWELINK_REGION=<your_region>" doganm95/ewelink-rest-api-server`  
+
+    ```bash
+    docker run \
+        -p <port>:3000 \
+        -e "EWELINK_USERNAME=<your_username>" \
+        -e "EWELINK_PASSWORD=<your_password>"  \
+        -e "EWELINK_REGION=<your_region>" \
+        -e "HASHING_ALGORITHM=<your_preferred_algorithm>" \
+        -e "SERVER_MODE=dev" \
+        -v "<your_local_pem_certs_folder>:/usr/src/app/volume/ssl/" \
+        doganm95/ewelink-rest-api-server
+    ```
 
 ## Requests
+
+### Get a list of all your registered devices and their information (Name, ID, ...)
+
+`GET`-request with any/no body to the server.
 
 ### Control a device using keywords or its ID
 
@@ -36,7 +51,3 @@
 - `deviceid` is the device's id itself, can be looked up e.g. in the eWelink Smartphone app or using a get request to this server.  Deviceid will always be prioritized over devicenameincludes.  
 
 - `switch` is the action to perform on the chosen device. Possible actions are `on`, `off` and `toggle`, which switches the device to the state it is currently not in.  
-
-### Get a list of all your registered devices and their information (Name, ID, ...)
-
-  `GET`-request with any/no body to the server.
