@@ -1,34 +1,74 @@
-import {
-    createRequire
-} from "module";
-const require = createRequire(
-    import.meta.url);
+import { createRequire } from "module";
+let require = createRequire(import.meta.url);
+
+const fs = require("fs");
 const ewelink = require("ewelink-api");
 const express = require("express");
 const app = express();
 const escape = require("escape-html");
+const https = require("https");
+const crypto = require("crypto");
 
-const connection = new ewelink({
+try {
+    fs.mkdirSync("./volume/ssl/");
+} catch (e) {}
+
+const ssl = {
+    key: fs.readFileSync("./volume/ssl/privkey.pem", "utf8"),
+    cert: fs.readFileSync("./volume/ssl/cert.pem", "utf8"),
+};
+
+const ewelinkConnection = new ewelink({
     email: process.env.EWELINK_USERNAME,
     password: process.env.EWELINK_PASSWORD,
-    region: process.env.EWELINK_REGION
+    region: process.env.EWELINK_REGION,
 });
-const port = process.env.PORT;
+const constants = {
+    port: 3000,
+    defaultHashingAlgorithm: "sha3-512",
+};
+const hashingAlgorithm = process.env.HASHING_ALGORITHM == undefined ? constants.defaultHashingAlgorithm : String(process.env.HASHING_ALGORITHM).toLowerCase();
 
-(async function testCredentials() {
-    const devices = await connection.getDevices();
-    if ("error" in devices)
-        console.log(devices.msg + ". The application will continue and respond with the error message, to make sure you are informed.");
+// disable console logging, if docker run -e "SERVER_MODE=prod"
+if (process.env.SERVER_MODE == "prod") {
+    console.log = () => {};
+}
+
+// (async function containerKeepAliveForAnalysis() {
+//     console.log("Keeping container alive for filesystem analysis..");
+//     while (true) {}
+// })();
+
+(async function initialize() {
+    // test credentials
+    let devices = await ewelinkConnection.getDevices();
+    if ("error" in devices) console.log(devices.msg + ". The application will continue and respond with the error message, to make sure you are informed.");
+
+    // log hashed password on app start
+    console.log(hashingAlgorithm + " hashed password: " + hashPassword());
+    console.log("Supported hashing algorithms by crypto:");
+    console.log(crypto.getHashes());
 })();
 
 app.use(express.json()); // treat all request bodies as application/json
+
+app.all("/", async (req, res, next) => {
+    try {
+        authenticate(req);
+    } catch (e) {
+        res.status(401).json(e);
+        return;
+    }
+
+    next();
+});
 
 app.post("/", async (req, res) => {
     const requestedDeviceNameKeys = req.body.devicenameincludes != undefined ? Array.from(req.body.devicenameincludes) : undefined;
     const requestedDeviceId = req.body.deviceid != undefined && req.body.deviceid != "" ? String(req.body.deviceid) : undefined;
     const requestedActionOnDevice = req.body.params.switch != undefined && req.body.params.switch != "" ? String(req.body.params.switch) : undefined;
 
-    const devices = await connection.getDevices();
+    const devices = await ewelinkConnection.getDevices();
 
     if ("error" in devices) {
         res.status(devices.error).send(devices.msg);
@@ -37,10 +77,12 @@ app.post("/", async (req, res) => {
 
     let selectedDevice;
 
-    if (requestedDeviceId != undefined) // deviceid present?
+    if (requestedDeviceId != undefined)
+        // deviceid present?
         selectedDevice = getDeviceById(devices, requestedDeviceId);
     else {
-        if (requestedDeviceNameKeys != undefined && requestedDeviceNameKeys.length > 0) // name keys present?
+        if (requestedDeviceNameKeys != undefined && requestedDeviceNameKeys.length > 0)
+            // name keys present?
             selectedDevice = getDeviceByName(devices, requestedDeviceNameKeys);
         else {
             res.status(400).send(`You need to specify at least one of [deviceid, devicenameincludes]`);
@@ -50,41 +92,36 @@ app.post("/", async (req, res) => {
 
     if (selectedDevice != undefined) {
         const actionResponse =
-            requestedActionOnDevice == "toggle" ?
-            await connection.toggleDevice(selectedDevice.deviceid) :
-            await connection.setDevicePowerState(selectedDevice.deviceid, requestedActionOnDevice);
-        const deviceStateAfterAction = await connection.getDevicePowerState(selectedDevice.deviceid);
+            requestedActionOnDevice == "toggle"
+                ? await ewelinkConnection.toggleDevice(selectedDevice.deviceid)
+                : await ewelinkConnection.setDevicePowerState(selectedDevice.deviceid, requestedActionOnDevice);
+        const deviceStateAfterAction = await ewelinkConnection.getDevicePowerState(selectedDevice.deviceid);
 
         switch (requestedActionOnDevice) {
             case "on":
             case "off":
                 res.status(actionResponse.status == "ok" ? 200 : 404).send(
                     `Device ''${selectedDevice.deviceid}'' named ''${selectedDevice.name}'' ${
-                    actionResponse.status == "ok" ?
-                        "successfully switched " + deviceStateAfterAction.state :
-                        "failed to switch " + (deviceStateAfterAction.state == "on" ? "off" : "on")
-                    }`
+                        actionResponse.status == "ok" ? "successfully switched " + deviceStateAfterAction.state : "failed to switch " + (deviceStateAfterAction.state == "on" ? "off" : "on")
+                    }`,
                 );
                 break;
             case "toggle":
                 res.status(actionResponse.status == "ok" ? 200 : 404).send(
                     `Device ''${selectedDevice.deviceid}'' named ''${selectedDevice.name}'' ${
-                    actionResponse.status == "ok" ?
-                        "successfully toggled " + deviceStateAfterAction.state :
-                        "failed to toggle " + (deviceStateAfterAction.state == "on" ? "off" : "on")
-                    }`
+                        actionResponse.status == "ok" ? "successfully toggled " + deviceStateAfterAction.state : "failed to toggle " + (deviceStateAfterAction.state == "on" ? "off" : "on")
+                    }`,
                 );
                 break;
             default:
                 res.status(400).send(`Invalid action ${escape(requestedActionOnDevice)}, valid choices are [on, off, toggle]`);
                 break;
         }
-    } else
-        res.status(404).send(`No device found matching id: "${escape(requestedDeviceId)}" or name-keys: "${escape(requestedDeviceNameKeys)}"`);
+    } else res.status(404).send(`No device found matching id: "${escape(requestedDeviceId)}" or name-keys: "${escape(requestedDeviceNameKeys)}"`);
 });
 
 app.get("/", async (req, res) => {
-    const devices = await connection.getDevices();
+    const devices = await ewelinkConnection.getDevices();
 
     if ("error" in devices) {
         res.status(devices.error).send(devices.msg);
@@ -94,22 +131,23 @@ app.get("/", async (req, res) => {
     res.status(200).json(devices);
 });
 
-app.listen(port, () => {
-    console.log(`Ewelink api server listening on http://localhost:${port}`);
+let httpsServer = https.createServer(ssl, app);
+
+httpsServer.listen(constants.port, () => {
+    console.log(`Ewelink api server listening on https://localhost:${constants.port}`);
 });
 
-/** 
+/**
  * @param {Object[]} devices Contains all known devices
  * @param {String[]} nameKeys Contains keywords to match the name fully/partly
- * @returns {Object} device, that matches the keyword sum best
-*/
+ * @returns {Object} device, that matches the sum of keywords best
+ */
 function getDeviceByName(devices, nameKeys) {
     let bestMatchingDevice = undefined;
     let highestMatchingKeyCount = 0;
     for (let deviceIndex in devices) {
         let matchingKeyCount = 0;
-        for (let nameKeyIndex in nameKeys)
-            matchingKeyCount += String(devices[deviceIndex].name).toLowerCase().includes(String(nameKeys[nameKeyIndex]).toLowerCase()) ? 1 : 0;
+        for (let nameKeyIndex in nameKeys) matchingKeyCount += String(devices[deviceIndex].name).toLowerCase().includes(String(nameKeys[nameKeyIndex]).toLowerCase()) ? 1 : 0;
         if (matchingKeyCount > highestMatchingKeyCount) {
             highestMatchingKeyCount = matchingKeyCount;
             bestMatchingDevice = devices[deviceIndex];
@@ -118,16 +156,30 @@ function getDeviceByName(devices, nameKeys) {
     return bestMatchingDevice;
 }
 
-/** 
+/**
  * @param {Object[]} devices Contains all known devices
  * @param {String[]} id ID of device to control, look up in ewelink app
  * @returns {Object} device, matching the given id
-*/
+ */
 function getDeviceById(devices, id) {
     let deviceToReturn = undefined;
-    devices.forEach(device => {
-        if (String(device.deviceid) == id)
-            deviceToReturn = device;
+    devices.forEach((device) => {
+        if (String(device.deviceid) == id) deviceToReturn = device;
     });
     return deviceToReturn;
+}
+
+function authenticate(req) {
+    if (req.headers.authorization == undefined) {
+        throw "Authentication failed - bearer token missing";
+    }
+
+    const receivedToken = req.headers.authorization.replace("Bearer ", ""); // received hashed ewelink password
+    const hashedPassword = hashPassword();
+
+    if (receivedToken != hashedPassword) throw "Authentication failed - wrong bearer token.";
+}
+
+function hashPassword() {
+    return crypto.createHash(hashingAlgorithm).update(process.env.EWELINK_PASSWORD).digest("hex"); // stored hashed ewelink password
 }
