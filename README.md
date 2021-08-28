@@ -1,12 +1,12 @@
 ### Runs a node.js server which accepts http requests and sends corresponding commands to ewelink servers to turn on/off or toggle devices using [this eWelink API](https://ewelink-api.now.sh/docs/quickstart)
 
-## Setup (Docker Container)
+# Setup (Docker Container)
 
-- ### Using pre-built image from docker hub (recommended)
+- ## Using pre-built image from docker hub (recommended)
 
     [See documentation on docker hub](https://hub.docker.com/repository/docker/doganm95/ewelink-rest-api-server)
 
-- ### Building it locally (clone repository first)
+- ## Building it locally (clone repository first)
 
   1. `git clone https://github.com/DoganM95/Ewelink-rest-api-server`  
   2. Open a terminal session in the cloned folder
@@ -25,6 +25,12 @@
         -v "<your_local_pem_certs_folder>:/usr/src/app/volume/ssl/" \
         doganm95/ewelink-rest-api-server
     ```
+
+# Usage
+
+## Authorization
+
+Every request needs an `Authorization` header, containing a Bearer Token. The Bearer Token is your Ewelink password, hashed using the algorithm you chose before (default: sha3-512). Running the container in dev mode logs the hashed pw, which can be copied.
 
 ## Requests
 
