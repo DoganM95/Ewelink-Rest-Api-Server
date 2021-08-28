@@ -8,4 +8,5 @@ README.md
 **/npm-debug.log
 
 # personal data
-**/docker_reset.ps1
+**/docker-reset.ps1
+/docker

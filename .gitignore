@@ -9,4 +9,4 @@ credentials.js
 settings.js
 
 # Provate build and run script
-**/docker_reset.ps1
+**/docker-reset.ps1
