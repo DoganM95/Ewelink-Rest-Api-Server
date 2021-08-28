@@ -6,6 +6,7 @@ const ewelink = require("ewelink-api");
 const express = require("express");
 const app = express();
 const escape = require("escape-html");
+const http = require("http");
 const https = require("https");
 const crypto = require("crypto");
 
@@ -13,10 +14,19 @@ try {
     fs.mkdirSync("./volume/ssl/");
 } catch (e) {}
 
-const ssl = {
-    key: fs.readFileSync("./volume/ssl/privkey.pem", "utf8"),
-    cert: fs.readFileSync("./volume/ssl/cert.pem", "utf8"),
-};
+let ssl;
+let useSsl;
+try {
+    ssl = {
+        key: fs.readFileSync("./volume/ssl/privkey.pem", "utf8"),
+        cert: fs.readFileSync("./volume/ssl/cert.pem", "utf8"),
+    };
+    useSsl = true;
+} catch (e) {
+    console.log(e);
+    console.log("STarting server without encryption.");
+    useSsl = false;
+}
 
 const ewelinkConnection = new ewelink({
     email: process.env.EWELINK_USERNAME,
@@ -131,11 +141,15 @@ app.get("/", async (req, res) => {
     res.status(200).json(devices);
 });
 
-let httpsServer = https.createServer(ssl, app);
-
-httpsServer.listen(constants.port, () => {
-    console.log(`Ewelink api server listening on https://localhost:${constants.port}`);
-});
+if (useSsl) {
+    https.createServer(ssl, app).listen(constants.port, () => {
+        console.log(`Ewelink api server listening on https://localhost:${constants.port} (Container)`);
+    });
+} else {
+    http.createServer(app).listen(constants.port, () => {
+        console.log(`Ewelink api server listening on http://localhost:${constants.port} (Container)`);
+    });
+}
 
 /**
  * @param {Object[]} devices Contains all known devices
@@ -170,14 +184,16 @@ function getDeviceById(devices, id) {
 }
 
 function authenticate(req) {
-    if (req.headers.authorization == undefined) {
-        throw "Authentication failed - bearer token missing";
+    if (useSsl) {
+        if (req.headers.authorization == undefined) {
+            throw "Authentication failed - bearer token missing";
+        }
+
+        const receivedToken = req.headers.authorization.replace("Bearer ", ""); // received hashed ewelink password
+        const hashedPassword = hashPassword();
+
+        if (receivedToken != hashedPassword) throw "Authentication failed - wrong bearer token.";
     }
-
-    const receivedToken = req.headers.authorization.replace("Bearer ", ""); // received hashed ewelink password
-    const hashedPassword = hashPassword();
-
-    if (receivedToken != hashedPassword) throw "Authentication failed - wrong bearer token.";
 }
 
 function hashPassword() {
