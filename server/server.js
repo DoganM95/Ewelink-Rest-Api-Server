@@ -37,7 +37,7 @@ const constants = {
     port: 3000,
     defaultHashingAlgorithm: "sha3-512",
 };
-const hashingAlgorithm = process.env.HASHING_ALGORITHM == undefined ? constants.defaultHashingAlgorithm : String(process.env.HASHING_ALGORITHM).toLowerCase();
+const hashingAlgorithm = process.env.PASSWORD_HASHING_ALGORITHM == undefined ? constants.defaultHashingAlgorithm : String(process.env.PASSWORD_HASHING_ALGORITHM).toLowerCase();
 
 // disable console logging, if docker run -e "SERVER_MODE=prod"
 if (process.env.SERVER_MODE == "prod") {
