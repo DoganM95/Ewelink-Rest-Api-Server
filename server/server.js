@@ -10,6 +10,10 @@ const http = require("http");
 const https = require("https");
 const crypto = require("crypto");
 
+// ------------------------------------------------------------------------------------------------------------------------
+// Preperation
+// ------------------------------------------------------------------------------------------------------------------------
+
 try {
     fs.mkdirSync("./volume/ssl/");
 } catch (e) {}
@@ -38,6 +42,7 @@ const constants = {
     defaultHashingAlgorithm: "sha3-512",
 };
 const hashingAlgorithm = process.env.PASSWORD_HASHING_ALGORITHM == undefined ? constants.defaultHashingAlgorithm : String(process.env.PASSWORD_HASHING_ALGORITHM).toLowerCase();
+const hashedPassword = hashPassword();
 
 // disable console logging, if docker run -e "SERVER_MODE=prod"
 if (process.env.SERVER_MODE == "prod") {
@@ -61,6 +66,10 @@ if (process.env.SERVER_MODE == "prod") {
 })();
 
 app.use(express.json()); // treat all request bodies as application/json
+
+// ------------------------------------------------------------------------------------------------------------------------
+// Routing
+// ------------------------------------------------------------------------------------------------------------------------
 
 app.all("/", async (req, res, next) => {
     try {
@@ -141,6 +150,10 @@ app.get("/", async (req, res) => {
     res.status(200).json(devices);
 });
 
+// ------------------------------------------------------------------------------------------------------------------------
+// Server start
+// ------------------------------------------------------------------------------------------------------------------------
+
 if (useSsl) {
     https.createServer(ssl, app).listen(constants.port, () => {
         console.log(`Ewelink api server listening on https://localhost:${constants.port} (Container)`);
@@ -150,6 +163,10 @@ if (useSsl) {
         console.log(`Ewelink api server listening on http://localhost:${constants.port} (Container)`);
     });
 }
+
+// ------------------------------------------------------------------------------------------------------------------------
+// Functions
+// ------------------------------------------------------------------------------------------------------------------------
 
 /**
  * @param {Object[]} devices Contains all known devices
@@ -189,13 +206,11 @@ function authenticate(req) {
             throw "Authentication failed - bearer token missing";
         }
 
-        const receivedToken = req.headers.authorization.replace("Bearer ", ""); // received hashed ewelink password
-        const hashedPassword = hashPassword();
-
+        const receivedToken = req.headers.authorization.replace("Bearer ", "");
         if (receivedToken != hashedPassword) throw "Authentication failed - wrong bearer token.";
     }
 }
 
 function hashPassword() {
-    return crypto.createHash(hashingAlgorithm).update(process.env.EWELINK_PASSWORD).digest("hex"); // stored hashed ewelink password
+    return crypto.createHash(hashingAlgorithm).update(process.env.EWELINK_PASSWORD).digest("hex");
 }
