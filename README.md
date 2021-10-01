@@ -34,26 +34,26 @@ If ssl encryption is used (by providing a `privkey.pem` and a `cert.pem`, see do
 
 ## Requests
 
-### Get a list of all your registered devices and their information (Name, ID, ...)
+- ### Get a list of all your registered devices and their information (Name, ID, ...)
 
-`GET`-request with any/no body to the server.
+    `GET`-request with any/no body to the server.
 
-### Control a device using keywords or its ID
+- ### Control a device using keywords or its ID
 
-`POST`-request to the server with the following body for example:  
+    `POST`-request to the server with the following body for example:  
 
-```json
-{  
-    "devicenameincludes": ["desk", "light"],  
-    "deviceid": "100012f3f4",
-    "params": {
-        "switch": "on"
+    ```json
+    {  
+        "devicenameincludes": ["desk", "light"],  
+        "deviceid": "100012f3f4",
+        "params": {
+            "switch": "on"
+        }
     }
-}
-```
+    ```
 
-- `devicenameincludes` is an array of keywords which the name of the device to be controlled can contain. The device which has the highest match to the given keywords will be controlled. If multiple devices have the same match-score, the last device (of devices object, see GET-Request) is controlled.  
+    - `devicenameincludes` is an array of keywords which the name of the device to be controlled can contain. The device which has the highest match to the given keywords will be controlled. If multiple devices have the same match-score, the last device (of devices object, see GET-Request) is controlled.  
 
-- `deviceid` is the device's id itself, can be looked up e.g. in the eWelink Smartphone app or using a get request to this server.  Deviceid will always be prioritized over devicenameincludes.  
+    - `deviceid` is the device's id itself, can be looked up e.g. in the eWelink Smartphone app or using a get request to this server.  Deviceid will always be prioritized over devicenameincludes.  
 
-- `switch` is the action to perform on the chosen device. Possible actions are `on`, `off` and `toggle`, which switches the device to the state it is currently not in.  
+    - `switch` is the action to perform on the chosen device. Possible actions are `on`, `off` and `toggle`, which switches the device to the state it is currently not in.  
