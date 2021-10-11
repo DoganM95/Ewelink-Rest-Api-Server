@@ -1,5 +1,7 @@
 ### Runs a node.js server which accepts http requests and sends corresponding commands to ewelink servers to turn on/off or toggle devices using [this eWelink API](https://ewelink-api.now.sh/docs/quickstart)
 
+[![Docker CI/CD](https://github.com/DoganM95/Ewelink-rest-api-server/actions/workflows/docker-image.yml/badge.svg)](https://github.com/DoganM95/Ewelink-rest-api-server/actions/workflows/docker-image.yml)
+
 # Setup (Docker Container)
 
 - ## Using pre-built image from docker hub (recommended)
