@@ -122,14 +122,14 @@ app.post("/", async (req, res) => {
             case "off":
                 res.status(actionResponse.status == "ok" ? 200 : 404).send(
                     `Device ''${selectedDevice.deviceid}'' named ''${selectedDevice.name}'' ${
-                        actionResponse.status == "ok" ? "successfully switched " + deviceStateAfterAction.state : "failed to switch " + (deviceStateAfterAction.state == "on" ? "off" : "on")} ${(requestedOutlet != undefined ? "outlet " + requestedOutlet : undefined)
+                        actionResponse.status == "ok" ? "successfully switched " + deviceStateAfterAction.state : "failed to switch " + (deviceStateAfterAction.state == "on" ? "off" : "on")} ${(requestedOutlet != undefined ? "outlet " + requestedOutlet : "")
                     }`,
                 );
                 break;
             case "toggle":
                 res.status(actionResponse.status == "ok" ? 200 : 404).send(
                     `Device ''${selectedDevice.deviceid}'' named ''${selectedDevice.name}'' ${
-                        actionResponse.status == "ok" ? "successfully toggled " + deviceStateAfterAction.state : "failed to toggle " + (deviceStateAfterAction.state == "on" ? "off" : "on")}  ${(requestedOutlet != undefined ? "outlet " + requestedOutlet : undefined)
+                        actionResponse.status == "ok" ? "successfully toggled " + deviceStateAfterAction.state : "failed to toggle " + (deviceStateAfterAction.state == "on" ? "off" : "on")}  ${(requestedOutlet != undefined ? "outlet " + requestedOutlet : "")
                     }`,
                 );
                 break;
