@@ -49,7 +49,8 @@ If ssl encryption is used (by providing a `privkey.pem` and a `cert.pem`, see do
         "devicenameincludes": ["desk", "light"],  
         "deviceid": "100012f3f4",
         "params": {
-            "switch": "on"
+            "switch": "on",
+	    "outlet": 2
         }
     }
     ```
@@ -59,3 +60,5 @@ If ssl encryption is used (by providing a `privkey.pem` and a `cert.pem`, see do
     - `deviceid` is the device's id itself, can be looked up e.g. in the eWelink Smartphone app or using a get request to this server.  Deviceid will always be prioritized over devicenameincludes.  
 
     - `switch` is the action to perform on the chosen device. Possible actions are `on`, `off` and `toggle`, which switches the device to the state it is currently not in.  
+
+    - `outlet` is optional field for multi-relay devices. Relay count starts from 1.
