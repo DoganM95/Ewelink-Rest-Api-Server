@@ -50,7 +50,7 @@ If ssl encryption is used (by providing a `privkey.pem` and a `cert.pem`, see do
         "deviceid": "100012f3f4",
         "params": {
             "switch": "on",
-	    "outlet": 2
+            "outlet": 2
         }
     }
     ```
