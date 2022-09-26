@@ -86,6 +86,7 @@ app.post("/", async (req, res) => {
     const requestedDeviceNameKeys = req.body.devicenameincludes != undefined ? Array.from(req.body.devicenameincludes) : undefined;
     const requestedDeviceId = req.body.deviceid != undefined && req.body.deviceid != "" ? String(req.body.deviceid) : undefined;
     const requestedActionOnDevice = req.body.params.switch != undefined && req.body.params.switch != "" ? String(req.body.params.switch) : undefined;
+    const requestedOutlet = req.body.params.outlet != undefined && req.body.params.outlet != "" ? String(req.body.params.outlet) : undefined;
 
     const devices = await ewelinkConnection.getDevices();
 
@@ -112,23 +113,23 @@ app.post("/", async (req, res) => {
     if (selectedDevice != undefined) {
         const actionResponse =
             requestedActionOnDevice == "toggle"
-                ? await ewelinkConnection.toggleDevice(selectedDevice.deviceid)
-                : await ewelinkConnection.setDevicePowerState(selectedDevice.deviceid, requestedActionOnDevice);
-        const deviceStateAfterAction = await ewelinkConnection.getDevicePowerState(selectedDevice.deviceid);
+                ? await ewelinkConnection.toggleDevice(selectedDevice.deviceid, requestedOutlet)
+                : await ewelinkConnection.setDevicePowerState(selectedDevice.deviceid, requestedActionOnDevice, requestedOutlet);
+        const deviceStateAfterAction = await ewelinkConnection.getDevicePowerState(selectedDevice.deviceid, requestedOutlet);
 
         switch (requestedActionOnDevice) {
             case "on":
             case "off":
                 res.status(actionResponse.status == "ok" ? 200 : 404).send(
                     `Device ''${selectedDevice.deviceid}'' named ''${selectedDevice.name}'' ${
-                        actionResponse.status == "ok" ? "successfully switched " + deviceStateAfterAction.state : "failed to switch " + (deviceStateAfterAction.state == "on" ? "off" : "on")
+                        actionResponse.status == "ok" ? "successfully switched " + deviceStateAfterAction.state : "failed to switch " + (deviceStateAfterAction.state == "on" ? "off" : "on")} ${(requestedOutlet != undefined ? "outlet " + requestedOutlet : "")
                     }`,
                 );
                 break;
             case "toggle":
                 res.status(actionResponse.status == "ok" ? 200 : 404).send(
                     `Device ''${selectedDevice.deviceid}'' named ''${selectedDevice.name}'' ${
-                        actionResponse.status == "ok" ? "successfully toggled " + deviceStateAfterAction.state : "failed to toggle " + (deviceStateAfterAction.state == "on" ? "off" : "on")
+                        actionResponse.status == "ok" ? "successfully toggled " + deviceStateAfterAction.state : "failed to toggle " + (deviceStateAfterAction.state == "on" ? "off" : "on")}  ${(requestedOutlet != undefined ? "outlet " + requestedOutlet : "")
                     }`,
                 );
                 break;
