@@ -2,7 +2,7 @@
   "dependencies": {
     "escape": "^0.0.1",
     "ewelink-api": "^3.1.1",
-    "express": "^4.17.1"
+    "express": "^4.17.3"
   },
   "name": "ewelink-rest-api-server",
   "version": "1.0.0",
