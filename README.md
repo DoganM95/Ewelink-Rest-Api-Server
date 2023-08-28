@@ -1,5 +1,7 @@
 ### Runs a node.js server which accepts http requests and sends corresponding commands to ewelink servers to turn on/off or toggle devices using [this eWelink API](https://ewelink-api.now.sh/docs/quickstart)
 
+[![Docker CI/CD](https://github.com/DoganM95/Ewelink-rest-api-server/actions/workflows/docker-image.yml/badge.svg)](https://github.com/DoganM95/Ewelink-rest-api-server/actions/workflows/docker-image.yml)
+
 # Setup (Docker Container)
 
 - ## Using pre-built image from docker hub (recommended)
@@ -30,30 +32,33 @@
 
 ## Authorization
 
-Every request needs an `Authorization` header, containing a Bearer Token. The Bearer Token is your Ewelink password, hashed using the algorithm you chose before (default: sha3-512). Running the container in dev mode logs the hashed pw, which can be copied.
+If ssl encryption is used (by providing a `privkey.pem` and a `cert.pem`, see docker hub), every request needs an `Authorization` header, containing a Bearer Token. The Bearer Token is your Ewelink password, hashed using the algorithm you chose before (default: sha3-512). Running the container in dev mode logs the hashed pw, which can be copied.
 
 ## Requests
 
-### Get a list of all your registered devices and their information (Name, ID, ...)
+- ### Get a list of all your registered devices and their information (Name, ID, ...)
 
-`GET`-request with any/no body to the server.
+    `GET`-request with any/no body to the server.
 
-### Control a device using keywords or its ID
+- ### Control a device using keywords or its ID
 
-`POST`-request to the server with the following body for example:  
+    `POST`-request to the server with the following body for example:  
 
-```json
-{  
-    "devicenameincludes": ["desk", "light"],  
-    "deviceid": "100012f3f4",
-    "params": {
-        "switch": "on"
+    ```json
+    {  
+        "devicenameincludes": ["desk", "light"],  
+        "deviceid": "100012f3f4",
+        "params": {
+            "switch": "on",
+            "outlet": 2
+        }
     }
-}
-```
+    ```
 
-- `devicenameincludes` is an array of keywords which the name of the device to be controlled can contain. The device which has the highest match to the given keywords will be controlled. If multiple devices have the same match-score, the last device (of devices object, see GET-Request) is controlled.  
+    - `devicenameincludes` is an array of keywords which the name of the device to be controlled can contain. The device which has the highest match to the given keywords will be controlled. If multiple devices have the same match-score, the last device (of devices object, see GET-Request) is controlled.  
 
-- `deviceid` is the device's id itself, can be looked up e.g. in the eWelink Smartphone app or using a get request to this server.  Deviceid will always be prioritized over devicenameincludes.  
+    - `deviceid` is the device's id itself, can be looked up e.g. in the eWelink Smartphone app or using a get request to this server.  Deviceid will always be prioritized over devicenameincludes.  
 
-- `switch` is the action to perform on the chosen device. Possible actions are `on`, `off` and `toggle`, which switches the device to the state it is currently not in.  
+    - `switch` is the action to perform on the chosen device. Possible actions are `on`, `off` and `toggle`, which switches the device to the state it is currently not in.  
+
+    - `outlet` is optional field for multi-relay devices. Relay count starts from 1.
