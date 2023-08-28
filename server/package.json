@@ -10,11 +10,14 @@
   "main": "index.js",
   "scripts": {
     "setupw": "powershell '../setup/windows.ps1' && npm install",
-    "serve": "node ./server.js",
+    "serve": "nodemon ./server.js",
     "kill": "sudo killall node",
     "killw": "taskkill /f /im node.exe"
   },
   "author": "DoganM95",
   "license": "MIT License",
-  "description": "Server-code "
+  "description": "Server-code ",
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
 }
