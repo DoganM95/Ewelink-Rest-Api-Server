@@ -1,18 +1,10 @@
-import { createRequire } from "module";
-let require = createRequire(import.meta.url);
-
-const fs = require("fs");
-const ewelink = require("ewelink-api");
-const express = require("express");
-const app = express();
-const escape = require("escape-html");
-const http = require("http");
-const https = require("https");
-const crypto = require("crypto");
-
-// ------------------------------------------------------------------------------------------------------------------------
-// Preperation
-// ------------------------------------------------------------------------------------------------------------------------
+import fs from 'fs';
+import eWeLink from 'ewelink-api-next';
+import express from 'express';
+import escape from 'escape-html';
+import http from 'http';
+import https from 'https';
+import crypto from 'crypto';
 
 try {
     fs.mkdirSync("./volume/ssl/");
@@ -27,21 +19,19 @@ try {
     };
     useSsl = true;
 } catch (e) {
-    console.log(e);
-    console.log("STarting server without encryption.");
+    console.log(String(e).split("\n")[0]);
+    console.log("Starting server without encryption.");
     useSsl = false;
 }
 
-const ewelinkConnection = new ewelink({
-    email: process.env.EWELINK_USERNAME,
-    password: process.env.EWELINK_PASSWORD,
-    region: process.env.EWELINK_REGION,
+const ewelinkClient = new eWeLink.WebAPI({
+    appId: process.env.EWELINK_APP_ID || "",
+    appSecret: process.env.EWELINK_APP_SECRET || "",
+    region: process.env.EWELINK_REGION || "eu",
 });
-const constants = {
-    port: 3000,
-    defaultHashingAlgorithm: "sha3-512",
-};
-const hashingAlgorithm = process.env.PASSWORD_HASHING_ALGORITHM == undefined ? constants.defaultHashingAlgorithm : String(process.env.PASSWORD_HASHING_ALGORITHM).toLowerCase();
+
+const serverPort = 3000;
+const hashingAlgorithm = "sha3-512";
 const hashedPassword = hashPassword();
 
 // disable console logging, if docker run -e "SERVER_MODE=prod"
@@ -56,29 +46,31 @@ if (process.env.SERVER_MODE == "prod") {
 
 (async function initialize() {
     // test credentials
-    let devices = await ewelinkConnection.getDevices();
-    if ("error" in devices) console.log(devices.msg + ". The application will continue and respond with the error message, to make sure you are informed.");
+    const response = await ewelinkClient.user.login({
+        account: process.env.EWELINK_USERNAME || "",
+        password: process.env.EWELINK_PASSWORD || "",
+        areaCode: process.env.EWELINK_AREA_CODE || "+49",
+    });
+    console.info(JSON.stringify(response));
 
-    // log hashed password on app start
-    console.log(hashingAlgorithm + " hashed password: " + hashPassword());
-    console.log("Supported hashing algorithms by crypto:");
-    console.log(crypto.getHashes());
+    let devices = await ewelinkClient.device.getAllThingsAllPages();
+    if ("error" in devices) {
+        console.log(devices.msg + ". The application will continue and respond with the error message, to make sure you are informed.");
+    }
+
+    console.log(hashingAlgorithm + " hashed password: " + hashedPassword); // log hashed password on app start
 })();
 
-app.use(express.json()); // treat all request bodies as application/json
+const app = express();  // Make sure 'app' is defined here
 
-// ------------------------------------------------------------------------------------------------------------------------
-// Routing
-// ------------------------------------------------------------------------------------------------------------------------
+app.use(express.json()); // treat all request bodies as application/json
 
 app.all("/", async (req, res, next) => {
     try {
         authenticate(req);
     } catch (e) {
-        res.status(401).json(e);
-        return;
+        return res.status(401).json(e);
     }
-
     next();
 });
 
@@ -90,23 +82,18 @@ app.post("/", async (req, res) => {
 
     const devices = await ewelinkConnection.getDevices();
 
-    if ("error" in devices) {
-        res.status(devices.error).send(devices.msg);
-        return;
-    }
+    if ("error" in devices) return res.status(devices.error).send(devices.msg);
 
     let selectedDevice;
-
-    if (requestedDeviceId != undefined)
+    if (requestedDeviceId != undefined) {
         // deviceid present?
         selectedDevice = getDeviceById(devices, requestedDeviceId);
-    else {
-        if (requestedDeviceNameKeys != undefined && requestedDeviceNameKeys.length > 0)
+    } else {
+        if (requestedDeviceNameKeys != undefined && requestedDeviceNameKeys.length > 0) {
             // name keys present?
             selectedDevice = getDeviceByName(devices, requestedDeviceNameKeys);
-        else {
-            res.status(400).send(`You need to specify at least one of [deviceid, devicenameincludes]`);
-            return;
+        } else {
+            return res.status(400).send(`You need to specify at least one of [deviceid, devicenameincludes]`);
         }
     }
 
@@ -122,15 +109,15 @@ app.post("/", async (req, res) => {
             case "off":
                 res.status(actionResponse.status == "ok" ? 200 : 404).send(
                     `Device ''${selectedDevice.deviceid}'' named ''${selectedDevice.name}'' ${
-                        actionResponse.status == "ok" ? "successfully switched " + deviceStateAfterAction.state : "failed to switch " + (deviceStateAfterAction.state == "on" ? "off" : "on")} ${(requestedOutlet != undefined ? "outlet " + requestedOutlet : "")
-                    }`,
+                        actionResponse.status == "ok" ? "successfully switched " + deviceStateAfterAction.state : "failed to switch " + (deviceStateAfterAction.state == "on" ? "off" : "on")
+                    } ${requestedOutlet != undefined ? "outlet " + requestedOutlet : ""}`,
                 );
                 break;
             case "toggle":
                 res.status(actionResponse.status == "ok" ? 200 : 404).send(
                     `Device ''${selectedDevice.deviceid}'' named ''${selectedDevice.name}'' ${
-                        actionResponse.status == "ok" ? "successfully toggled " + deviceStateAfterAction.state : "failed to toggle " + (deviceStateAfterAction.state == "on" ? "off" : "on")}  ${(requestedOutlet != undefined ? "outlet " + requestedOutlet : "")
-                    }`,
+                        actionResponse.status == "ok" ? "successfully toggled " + deviceStateAfterAction.state : "failed to toggle " + (deviceStateAfterAction.state == "on" ? "off" : "on")
+                    }  ${requestedOutlet != undefined ? "outlet " + requestedOutlet : ""}`,
                 );
                 break;
             default:
@@ -142,32 +129,19 @@ app.post("/", async (req, res) => {
 
 app.get("/", async (req, res) => {
     const devices = await ewelinkConnection.getDevices();
-
-    if ("error" in devices) {
-        res.status(devices.error).send(devices.msg);
-        return;
-    }
-
-    res.status(200).json(devices);
+    if ("error" in devices) return res.status(devices.error).send(devices.msg);
+    return res.status(200).json(devices);
 });
 
-// ------------------------------------------------------------------------------------------------------------------------
-// Server start
-// ------------------------------------------------------------------------------------------------------------------------
-
 if (useSsl) {
-    https.createServer(ssl, app).listen(constants.port, () => {
-        console.log(`Ewelink api server listening on https://localhost:${constants.port} (Container)`);
+    https.createServer(ssl, app).listen(serverPort, () => {
+        console.log(`Ewelink api server listening on https://localhost:${serverPort} (Container)`);
     });
 } else {
-    http.createServer(app).listen(constants.port, () => {
-        console.log(`Ewelink api server listening on http://localhost:${constants.port} (Container)`);
+    http.createServer(app).listen(serverPort, () => {
+        console.log(`Ewelink api server listening on http://localhost:${serverPort} (Container)`);
     });
 }
-
-// ------------------------------------------------------------------------------------------------------------------------
-// Functions
-// ------------------------------------------------------------------------------------------------------------------------
 
 /**
  * @param {Object[]} devices Contains all known devices
@@ -213,5 +187,8 @@ function authenticate(req) {
 }
 
 function hashPassword() {
-    return crypto.createHash(hashingAlgorithm).update(process.env.EWELINK_PASSWORD).digest("hex");
+    return crypto
+        .createHash(hashingAlgorithm)
+        .update(process.env.EWELINK_PASSWORD || "")
+        .digest("hex");
 }
