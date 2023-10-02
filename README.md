@@ -62,3 +62,15 @@ If ssl encryption is used (by providing a `privkey.pem` and a `cert.pem`, see do
     - `switch` is the action to perform on the chosen device. Possible actions are `on`, `off` and `toggle`, which switches the device to the state it is currently not in.  
 
     - `outlet` is optional field for multi-relay devices. Relay count starts from 1.
+
+
+## Migration
+
+### Resources
+
+Usefulk links for updating the project to support the new oauth mechanism of ewelink:
+- https://github.com/coolkit-carl/eWeLinkOAuthLoginDemo
+- https://github.com/coolkit-carl/ewelink-api-next/blob/main/docs/en/DeviceManagement.md
+- https://dev.ewelink.cc/#/
+- https://github.com/skydiver/ewelink-api/issues/220
+- https://coolkit-technologies.github.io/eWeLink-API/#/en/OAuth2.0
