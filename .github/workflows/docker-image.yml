@@ -21,6 +21,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ./docker/Dockerfile
           push: true
           tags: |
             ghcr.io/doganm95/ewelink-rest-api-server:v1.${{ github.run_number }}
