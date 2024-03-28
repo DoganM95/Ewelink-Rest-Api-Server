@@ -1,5 +1,4 @@
 # Ewelink REST API Server
-![Docker CI/CD](https://github.com/DoganM95/Ewelink-rest-api-server/actions/workflows/docker-image.yml/badge.svg)
 
 A Node.js server application that processes HTTP requests and forwards commands to eWeLink servers for device operations like turn on/off or toggling. This server utilizes the [eWeLink API](https://ewelink-api.now.sh/docs/quickstart).
 
