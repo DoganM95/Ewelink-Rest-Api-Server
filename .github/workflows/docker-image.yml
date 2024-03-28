@@ -1,50 +1,31 @@
-name: Docker CI/CD
+name: Publish Docker image
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-
+    paths-ignore:
+      - 'README.md'
 jobs:
-  docker:
+  build-and-push-image:
+    name: Build and push docker image to ghcr.io
     runs-on: ubuntu-latest
-    #     strategy:
-    #       matrix:
-    #         node: [14.x, 15.x]
-
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@master
-
-      #     - name: Setup specific node version
-      #       uses: actions/setup-node@main
-      #       with:
-      #         node-version: ${{matrix.node}}
-
-      - name: Install necessary packages
-        run: |
-          repo=$(pwd)
-          cd ./server
-          npm install
-          cd $repo
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@master
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@master
-
-      - name: Login to DockerHub
-        uses: docker/login-action@master
+      - name: Check out the repo
+        uses: actions/checkout@v4
+      - name: Log in to the container registry
+        uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_ACCESSTOKEN }}
-
-      - name: Build and push
-        uses: docker/build-push-action@master
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push docker images
+        uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./docker/Dockerfile
           push: true
-          tags: doganm95/ewelink-rest-api-server:latest
+          tags: |
+            ghcr.io/doganm95/ewelink-rest-api-server:v1.${{ github.run_number }}
+            ghcr.io/doganm95/ewelink-rest-api-server:${{ github.sha }}
+            ghcr.io/doganm95/ewelink-rest-api-server:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.repository_url }}
+            org.opencontainers.image.revision=${{ github.sha }}
